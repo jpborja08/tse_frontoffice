@@ -2,7 +2,7 @@ import 'tailwindcss/tailwind.css';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 
-import HeaderComponent from "@components/common/Header/header";
+import HeaderComponent from "@components/common/header/header";
 
 const CEDULAS_DE_CHOFERES = ["12345678", "87654321", "98765432", "23456789"];
 const MATRICULAS_DE_VEHICULOS = ["ABC123", "XYZ789", "DEF456", "GHI987"];
