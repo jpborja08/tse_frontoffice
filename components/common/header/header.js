@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from "next/link";
 
 const HeaderComponent = () => (
   <header className="bg-gray-800 text-white py-4 px-8 flex justify-between items-center">
@@ -13,7 +13,6 @@ const HeaderComponent = () => (
       </button>
     </div>
   </header>
-)
+);
 
-export default HeaderComponent
-
+export default HeaderComponent;

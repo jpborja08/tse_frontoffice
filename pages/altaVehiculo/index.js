@@ -1,9 +1,9 @@
-import 'tailwindcss/tailwind.css';
-import React from 'react';
-import { useRouter } from 'next/router';
+import "tailwindcss/tailwind.css";
+import React from "react";
+import { useRouter } from "next/router";
 
-import VehiculoForm from '@components/common/vehiculoForm';
-import HeaderComponent from '@components/common/header/header';
+import VehiculoForm from "@components/common/vehiculoForm";
+import HeaderComponent from "@components/common/header/header";
 
 function AltaVehiculo() {
   const router = useRouter();
@@ -14,10 +14,11 @@ function AltaVehiculo() {
   };
 
   return (
-    <div>
-      <HeaderComponent />
-      <VehiculoForm title="Alta de Vehículo" idEmpresa={idEmpresa} onSubmit={handleSubmit} />
-    </div>
+    <VehiculoForm
+      title="Alta de Vehículo"
+      idEmpresa={idEmpresa}
+      onSubmit={handleSubmit}
+    />
   );
 }
 
