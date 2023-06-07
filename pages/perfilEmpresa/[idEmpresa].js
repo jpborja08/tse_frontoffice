@@ -186,7 +186,7 @@ const PerfilEmpresa = () => {
                               <span className="font-semibold">
                                 Capacidad de carga:
                               </span>{" "}
-                              {vehiculo.capacidadCarga}
+                              {vehiculo.capacidad}
                             </p>
                             <p className="text-gray-600">
                               <span className="font-semibold">

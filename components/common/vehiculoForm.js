@@ -59,7 +59,9 @@ function VehiculoForm({ title, idEmpresa, onSubmit, initialData }) {
 
   return (
     <form onSubmit={handleSubmit} className="border p-7 text-gray-700">
-      <h2 className="font-bold text-xl mb-4 border-b pb-4">Alta de vehiculo</h2>
+      <h2 className="font-bold text-xl mb-4 border-b pb-4">
+        {initialData ? "Modificar vehículo" : "Registrar vehículo"}
+      </h2>
       <div className="columns-2">
         <div className="mb-4">
           <label className="block text-sm font-bold mb-2" htmlFor="matricula">
