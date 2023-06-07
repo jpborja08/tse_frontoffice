@@ -7,6 +7,7 @@ import Spinner from "@components/spinner";
 import axios from "axios";
 import Modal from "react-modal";
 import VehiculoForm from "@components/common/vehiculoForm";
+import { HiOutlineTrash } from "react-icons/hi2";
 
 import GuiaItem from "@components/common/guiaItem";
 
@@ -76,6 +77,12 @@ const PerfilEmpresa = () => {
     getEmpresa();
   };
 
+  const deleteVehicle = async (matricula) => {
+    await axios.delete(`/vehiculos/${matricula}`);
+
+    getEmpresa();
+  };
+
   return (
     <div className="bg-gray-100 min-h-screen">
       <div className="flex justify-center">
@@ -139,16 +146,21 @@ const PerfilEmpresa = () => {
 
                     <TabPanel>
                       <div>
-                        {activeTab === "vehiculos" && (
-                          <div className="mb-4">
-                            <button
-                              onClick={() => setCreatingVehicle(true)}
-                              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mb-4"
-                            >
-                              Dar de alta vehiculo
-                            </button>
-                          </div>
+                        <div className="mb-4">
+                          <button
+                            onClick={() => setCreatingVehicle(true)}
+                            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mb-4"
+                          >
+                            Dar de alta vehiculo
+                          </button>
+                        </div>
+
+                        {data.vehiculos.length === 0 && (
+                          <p className="text-gray-600">
+                            No hay vehiculos registrados
+                          </p>
                         )}
+
                         {data.vehiculos.map((vehiculo, index) => (
                           <div
                             key={index}
@@ -194,14 +206,22 @@ const PerfilEmpresa = () => {
                               </span>{" "}
                               {vehiculo.fechaInspeccion}
                             </p>
-                            {activeTab === "vehiculos" && (
+                            <div className="flex items-center justify-between mt-4">
                               <button
-                                className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mt-4"
+                                className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
                                 onClick={() => setModifyingVehicle(vehiculo)}
                               >
                                 Modificar vehiculo
                               </button>
-                            )}
+
+                              <button
+                                onClick={() =>
+                                  deleteVehicle(vehiculo.matricula)
+                                }
+                              >
+                                <HiOutlineTrash className="text-red-500 text-xl" />
+                              </button>
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -209,6 +229,12 @@ const PerfilEmpresa = () => {
 
                     <TabPanel>
                       <div>
+                        {data.choferes.length === 0 && (
+                          <p className="text-gray-600">
+                            No hay choferes registrados
+                          </p>
+                        )}
+
                         {data.choferes.map((chofer, index) => (
                           <div
                             key={index}
@@ -225,11 +251,14 @@ const PerfilEmpresa = () => {
 
                     <TabPanel>
                       <div>
-                        {activeTab === "guias" && (
-                          <button className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mb-4">
-                            Crear Guia
-                          </button>
+                        {data.choferes.length === 0 && (
+                          <p className="text-gray-600">
+                            No hay guias registrados
+                          </p>
                         )}
+                        <button className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mt-4">
+                          Crear Guia
+                        </button>
                         <div>
                           {data.guias.map((guia, index) => (
                             <GuiaItem key={index} guia={guia} />
