@@ -41,29 +41,39 @@ const PerfilEmpresa = () => {
   const [activeTab, setActiveTab] = useState("vehiculos");
   const [data, setData] = useState(null);
   const [creatingVehicle, setCreatingVehicle] = useState(false);
+  const [modifyingVehicle, setModifyingVehicle] = useState(null);
 
   const router = useRouter();
   const { idEmpresa } = router.query;
 
-  const handleModificarVehiculo = (idVehiculo) => {
-    router.push(`/modificarVehiculo/${idVehiculo}`);
+  const getEmpresa = async () => {
+    const res = await axios.get(`/empresas/${idEmpresa}`);
+    setData(res.data);
   };
 
   useEffect(() => {
     if (!idEmpresa) return;
 
-    const getEmpresa = async () => {
-      const res = await axios.get(`/empresas/${idEmpresa}`);
-      setData(res.data);
-    };
-
     getEmpresa();
   }, [idEmpresa]);
 
-  const createVehicle = async (formData) => {
-    console.log(formData);
-    const res = await axios.post("/vehiculos", formData);
-    console.log(res);
+  const createVehicle = async (vehiculo) => {
+    await axios.post("/vehiculos", vehiculo);
+
+    setCreatingVehicle(false);
+
+    getEmpresa();
+  };
+
+  const updateVehicle = async (vehiculo) => {
+    const matricula = vehiculo.matricula;
+    delete vehiculo.matricula;
+
+    await axios.put(`/vehiculos/${matricula}`, vehiculo);
+
+    setModifyingVehicle(null);
+
+    getEmpresa();
   };
 
   return (
@@ -187,9 +197,7 @@ const PerfilEmpresa = () => {
                             {activeTab === "vehiculos" && (
                               <button
                                 className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mt-4"
-                                onClick={() =>
-                                  handleModificarVehiculo(vehiculo.idVehiculo)
-                                }
+                                onClick={() => setModifyingVehicle(vehiculo)}
                               >
                                 Modificar vehiculo
                               </button>
@@ -240,10 +248,23 @@ const PerfilEmpresa = () => {
       <Modal
         isOpen={creatingVehicle}
         onRequestClose={() => setCreatingVehicle(false)}
-        contentLabel="Example Modal"
+        contentLabel="Alta de vehiculo"
         style={customStyles}
       >
         <VehiculoForm idEmpresa={idEmpresa} onSubmit={createVehicle} />
+      </Modal>
+
+      <Modal
+        isOpen={modifyingVehicle !== null}
+        onRequestClose={() => setModifyingVehicle(null)}
+        contentLabel="Modificación de vehiculo"
+        style={customStyles}
+      >
+        <VehiculoForm
+          idEmpresa={idEmpresa}
+          onSubmit={updateVehicle}
+          initialData={modifyingVehicle}
+        />
       </Modal>
     </div>
   );

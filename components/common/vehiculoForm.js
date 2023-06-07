@@ -19,15 +19,16 @@ function VehiculoForm({ title, idEmpresa, onSubmit, initialData }) {
   useEffect(() => {
     if (initialData) {
       setFormData({
-        empresaId: initialData.id_empresa || "",
-        matricula: initialData.matricula || "",
-        marca: initialData.marca || "",
-        modelo: initialData.modelo || "",
-        peso: initialData.peso || "",
-        capacidad: initialData.capacidad_carga || "",
-        numeroPermiso: initialData.numero_permiso || "",
-        fechaExpiracionPermiso: initialData.validez_permiso || "",
-        fechaInspeccion: initialData.fecha_inspeccion || "",
+        empresaId: initialData.empresa.id,
+        matricula: initialData.matricula,
+        marca: initialData.marca,
+        modelo: initialData.modelo,
+        peso: initialData.peso,
+        capacidad: initialData.capacidad,
+        numeroPermiso: initialData.numeroPermiso,
+        fechaExpiracionPermiso:
+          initialData.fechaExpiracionPermiso.split("T")[0],
+        fechaInspeccion: initialData.fechaInspeccion.split("T")[0],
         choferesCedula: [],
       });
     }
@@ -70,6 +71,7 @@ function VehiculoForm({ title, idEmpresa, onSubmit, initialData }) {
             name="matricula"
             type="text"
             placeholder="Matrícula"
+            disabled={!!initialData}
             value={formData.matricula}
             onChange={handleChange}
             required
@@ -203,7 +205,7 @@ function VehiculoForm({ title, idEmpresa, onSubmit, initialData }) {
           className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded focus:outline-none focus:shadow-outline"
           type="submit"
         >
-          Crear
+          {initialData ? "Editar" : "Crear"}
         </button>
       </div>
     </form>
