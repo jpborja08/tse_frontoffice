@@ -10,6 +10,7 @@ import VehiculoForm from "@components/common/vehiculoForm";
 import { HiOutlineTrash } from "react-icons/hi2";
 
 import GuiaItem from "@components/common/guiaItem";
+import { getSession } from "@lib/session";
 
 const customStyles = {
   content: {
@@ -53,9 +54,16 @@ const PerfilEmpresa = () => {
   };
 
   useEffect(() => {
-    if (!idEmpresa) return;
+    const token = sessionStorage.getItem("token");
 
-    getEmpresa();
+    if (!token) {
+      router.push('/login');
+    }
+    else {
+      if (!idEmpresa) return;
+
+      getEmpresa();
+    }
   }, [idEmpresa]);
 
   const createVehicle = async (vehiculo) => {

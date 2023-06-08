@@ -3,7 +3,7 @@ import 'tailwindcss/tailwind.css';
 export default function Login() {
   const handleLogin = async () => {
     const state = "grupo8" + Math.floor(Math.random()*1000000000);
-    const scope = 'openid%20personal%20email'
+    const scope = 'openid%20personal_info%20email%20document'
     const url = `${process.env.NEXT_PUBLIC_ID_URUGUAY_LOGIN}?response_type=code&scope=${scope}&client_id=${process.env.NEXT_PUBLIC_CLIENT_ID}&state=${state}&redirect_uri=${process.env.NEXT_PUBLIC_REDIRECT_URI}`;
     window.location.replace(url)
   }
