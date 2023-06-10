@@ -15,10 +15,13 @@ export default function Home( { req, res } ) {
   const { setToken } = useContext(AuthContext);
 
   useEffect(() => {
+    const token = sessionStorage.getItem("token");
 
-    if (!code) {
+    if (token) {
+      router.push('/perfilUsuario');
+    }
+    else if (!code) {
       router.push('/login');
-      return;
     }
     const fetchData = async () => {
       try {
