@@ -15,6 +15,11 @@ export default function Home( { req, res } ) {
   const { setToken } = useContext(AuthContext);
 
   useEffect(() => {
+
+    if (!code) {
+      router.push('/login');
+      return;
+    }
     const fetchData = async () => {
       try {
         const response = await axios.post(
@@ -31,7 +36,7 @@ export default function Home( { req, res } ) {
         sessionStorage.setItem("token", token);
         setToken(token);
         setAuthToken(token);
-        router.push('/perfilEmpresa/1');
+        router.push('/perfilUsuario');
       } catch (error) {
         console.error(error);
       };
