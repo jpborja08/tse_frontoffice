@@ -43,8 +43,19 @@ const HeaderComponent = () => {
   return (
     <header className="bg-gray-800 text-white py-4 px-8 flex justify-between items-center">
       <div>
-        <Link href="/" passHref>
+        <Link href="/perfilUsuario" passHref>
           CARGA UY
+        </Link>
+        <Link href="/perfilUsuario" passHref className="text-gray-300 hover:text-white hover:border-b-2 hover:border-white ml-6">
+          PerfilUsuario
+        </Link>
+        <Link href="/perfilEmpresa/1" passHref className="text-gray-300 hover:text-white hover:border-b-2 hover:border-white ml-6">
+          PerfilEmpresa 
+          {/* This should only be shown if the user is responsable de empresa and it should link to the empresa he is responsible for */}
+        </Link>
+        <Link href="/empresas" passHref className="text-gray-300 hover:text-white hover:border-b-2 hover:border-white ml-6">
+          Empresas
+          {/* This should only be shown if the user is funcionario MTOP */}
         </Link>
       </div>
       {showLogoutButton && (
