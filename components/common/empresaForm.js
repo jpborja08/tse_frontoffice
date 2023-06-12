@@ -46,7 +46,7 @@ const EmpresaForm = ({ onSubmit, initialData }) => {
           Nro. Empresa
         </label>
         <input
-          type="text"
+          type="number"
           id="numero"
           name="numero"
           value={formData.numero || ""}

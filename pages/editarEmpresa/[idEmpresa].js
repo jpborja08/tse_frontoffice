@@ -20,19 +20,29 @@ const EditarEmpresa = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      router.push('/login');
-    }
-    else {
+      router.push("/login");
+    } else {
       if (!idEmpresa) return;
 
       getEmpresa();
     }
   }, [idEmpresa]);
 
-  const updateEmpresa = async (empresa) => {
-    await axios.put(`/empresas/${idEmpresa}`, empresa); // change this to the correct endpoint after it is created
+  const updateEmpresa = async (formData) => {
+    const { nombre, razonSocial, numero, direccion } = formData;
+    const updatedEmpresa = {
+      nombre,
+      razonSocial,
+      numero,
+      direccion,
+    };
 
-    router.push(`/empresas/${idEmpresa}`);
+    try {
+      await axios.put(`/empresas/${idEmpresa}`, updatedEmpresa);
+      router.push(`/perfilEmpresa/${idEmpresa}`);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
