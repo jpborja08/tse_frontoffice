@@ -10,7 +10,9 @@ import VehiculoForm from "@components/common/vehiculoForm";
 import { HiOutlineTrash } from "react-icons/hi2";
 
 import GuiaItem from "@components/common/guiaItem";
-import { getSession } from "@lib/session";
+import GuiaForm from "@components/common/guiaForm";
+
+import dayjs from "dayjs";
 
 const customStyles = {
   content: {
@@ -44,6 +46,7 @@ const PerfilEmpresa = () => {
   const [data, setData] = useState(null);
   const [creatingVehicle, setCreatingVehicle] = useState(false);
   const [modifyingVehicle, setModifyingVehicle] = useState(null);
+  const [creatingGuia, setCreatingGuia] = useState(false);
 
   const router = useRouter();
   const { idEmpresa } = router.query;
@@ -57,9 +60,8 @@ const PerfilEmpresa = () => {
     const token = sessionStorage.getItem("token");
 
     if (!token) {
-      router.push('/login');
-    }
-    else {
+      router.push("/login");
+    } else {
       if (!idEmpresa) return;
 
       getEmpresa();
@@ -70,6 +72,14 @@ const PerfilEmpresa = () => {
     await axios.post("/vehiculos", vehiculo);
 
     setCreatingVehicle(false);
+
+    getEmpresa();
+  };
+
+  const createGuia = async (guia) => {
+    await axios.post(`/empresas/${idEmpresa}/guias`, guia);
+
+    setCreatingGuia(false);
 
     getEmpresa();
   };
@@ -154,14 +164,12 @@ const PerfilEmpresa = () => {
 
                     <TabPanel>
                       <div>
-                        <div className="mb-4">
-                          <button
-                            onClick={() => setCreatingVehicle(true)}
-                            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mb-4"
-                          >
-                            Dar de alta vehiculo
-                          </button>
-                        </div>
+                        <button
+                          onClick={() => setCreatingVehicle(true)}
+                          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mb-4"
+                        >
+                          Dar de alta vehiculo
+                        </button>
 
                         {data.vehiculos.length === 0 && (
                           <p className="text-gray-600">
@@ -206,13 +214,19 @@ const PerfilEmpresa = () => {
                               <span className="font-semibold">
                                 Validéz de permiso:
                               </span>{" "}
-                              {vehiculo.fechaInspeccion}
+                              {dayjs(vehiculo.fechaExpiracionPermiso)
+                                .utc("z")
+                                .local()
+                                .format("dddd, MMM D")}
                             </p>
                             <p className="text-gray-600">
                               <span className="font-semibold">
                                 Fecha de inspección:
                               </span>{" "}
-                              {vehiculo.fechaInspeccion}
+                              {dayjs(vehiculo.fechaInspeccion)
+                                .utc("z")
+                                .local()
+                                .format("dddd, MMM D")}
                             </p>
                             <div className="flex items-center justify-between mt-4">
                               <button
@@ -259,12 +273,15 @@ const PerfilEmpresa = () => {
 
                     <TabPanel>
                       <div>
-                        {data.choferes.length === 0 && (
+                        {data.guias.length === 0 && (
                           <p className="text-gray-600">
                             No hay guias registrados
                           </p>
                         )}
-                        <button className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mt-4">
+                        <button
+                          onClick={() => setCreatingGuia(true)}
+                          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mb-4"
+                        >
                           Crear Guia
                         </button>
                         <div>
@@ -302,6 +319,15 @@ const PerfilEmpresa = () => {
           onSubmit={updateVehicle}
           initialData={modifyingVehicle}
         />
+      </Modal>
+
+      <Modal
+        isOpen={creatingGuia}
+        onRequestClose={() => setCreatingGuia(false)}
+        contentLabel="Crear Guia"
+        style={customStyles}
+      >
+        <GuiaForm onSubmit={createGuia} />
       </Modal>
     </div>
   );
