@@ -1,12 +1,21 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import Select from "react-select";
 
-function GuiaForm({ idEmpresa, onSubmit, initialData, choferes }) {
+function GuiaForm({ idEmpresa, idGuia, onSubmit, choferes, viaje }) {
   const [isFormValid, setFormValid] = useState(true);
   const [chofer, setChofer] = useState(null);
   const [vehiculo, setVehiculo] = useState(null);
   const [vehiculosChofer, setVehiculosChofer] = useState(null);
+
+  useEffect(() => {
+    if (!viaje) {
+      return;
+    }
+
+    setChofer(viaje.chofer.cedula);
+    setVehiculo(viaje.vehiculo.matricula);
+  }, [viaje]);
 
   useEffect(() => {
     if (chofer === null) {
@@ -40,9 +49,18 @@ function GuiaForm({ idEmpresa, onSubmit, initialData, choferes }) {
       className="border p-7 text-gray-700 w-[400px]"
     >
       <h2 className="font-bold text-xl mb-4 border-b pb-4">
-        {initialData ? "Modificar viaje" : "Asignar viaje"}
+        {viaje ? "Modificar viaje" : "Asignar viaje"}
       </h2>
+
       <div>
+        {viaje !== undefined && (
+          <div className="mb-4 w-full">
+            <label className="block text-sm font-bold mb-2" htmlFor="chofer">
+              Guia
+            </label>
+            <p className="text-2xl font-bold">{idGuia}</p>
+          </div>
+        )}
         <div className="mb-4 w-full">
           <label className="block text-sm font-bold mb-2" htmlFor="chofer">
             Chofer
@@ -53,6 +71,10 @@ function GuiaForm({ idEmpresa, onSubmit, initialData, choferes }) {
               value: c.cedula,
               label: c.cedula,
             }))}
+            value={{
+              value: chofer,
+              label: chofer,
+            }}
             onChange={({ value }) => setChofer(value)}
           />
         </div>
@@ -67,6 +89,10 @@ function GuiaForm({ idEmpresa, onSubmit, initialData, choferes }) {
                 value: v.matricula,
                 label: v.matricula,
               }))}
+              value={{
+                value: vehiculo,
+                label: vehiculo,
+              }}
               onChange={({ value }) => setVehiculo(value)}
             />
           </div>
@@ -82,7 +108,7 @@ function GuiaForm({ idEmpresa, onSubmit, initialData, choferes }) {
           className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded focus:outline-none focus:shadow-outline"
           type="submit"
         >
-          {initialData ? "Editar" : "Crear"}
+          {viaje ? "Editar" : "Crear"}
         </button>
       </div>
     </form>

@@ -50,6 +50,7 @@ const PerfilEmpresa = () => {
   const [modifyingVehicle, setModifyingVehicle] = useState(null);
   const [creatingGuia, setCreatingGuia] = useState(false);
   const [creatingViajeForGuia, setCreatingViajeForGuia] = useState(null);
+  const [modifyingViaje, setModifyingViaje] = useState(null);
 
   const router = useRouter();
   const { idEmpresa } = router.query;
@@ -105,6 +106,16 @@ const PerfilEmpresa = () => {
     await axios.put(`/vehiculos/${matricula}`, vehiculo);
 
     setModifyingVehicle(null);
+
+    getEmpresa();
+  };
+
+  const updateViaje = async (viaje) => {
+    console.log(viaje);
+
+    // await axios.put(`/empresas/${idEmpresa}/guias/${modifyingViaje.guia.id}/viaje`, viaje);
+
+    setModifyingViaje(null);
 
     getEmpresa();
   };
@@ -306,6 +317,9 @@ const PerfilEmpresa = () => {
                               handleCreateViaje={() =>
                                 setCreatingViajeForGuia(guia)
                               }
+                              handleUpdateViaje={(viaje) =>
+                                setModifyingViaje(viaje)
+                              }
                             />
                           ))}
                         </div>
@@ -351,18 +365,36 @@ const PerfilEmpresa = () => {
       </Modal>
 
       {data !== null && (
-        <Modal
-          isOpen={creatingViajeForGuia !== null}
-          onRequestClose={() => setCreatingViajeForGuia(null)}
-          contentLabel="Crear Viaje"
-          style={customStyles}
-        >
-          <ViajeForm
-            idEmpresa={idEmpresa}
-            choferes={data.choferes}
-            onSubmit={createViaje}
-          />
-        </Modal>
+        <>
+          <Modal
+            isOpen={creatingViajeForGuia !== null}
+            onRequestClose={() => setCreatingViajeForGuia(null)}
+            contentLabel="Crear Viaje"
+            style={customStyles}
+          >
+            <ViajeForm
+              idEmpresa={idEmpresa}
+              idGuia={creatingViajeForGuia !== null && creatingViajeForGuia.id}
+              choferes={data.choferes}
+              onSubmit={createViaje}
+            />
+          </Modal>
+
+          <Modal
+            isOpen={modifyingViaje !== null}
+            onRequestClose={() => setModifyingViaje(null)}
+            contentLabel="Modificar viaje"
+            style={customStyles}
+          >
+            <ViajeForm
+              idEmpresa={idEmpresa}
+              idGuia={modifyingViaje !== null && modifyingViaje.guia.id}
+              choferes={data.choferes}
+              onSubmit={updateViaje}
+              viaje={modifyingViaje}
+            />
+          </Modal>
+        </>
       )}
     </div>
   );

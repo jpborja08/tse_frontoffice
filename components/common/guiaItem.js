@@ -1,23 +1,17 @@
-import { useRouter } from "next/router";
 import dayjs from "dayjs";
 
-const GuiaItem = ({ index, guia, handleCreateViaje }) => {
-  const router = useRouter();
-
-  const handleVerViajeClick = () => {
-    router.push(`/viaje/${guia.viaje.id}`);
-  };
-
+const GuiaItem = ({ index, guia, handleCreateViaje, handleUpdateViaje }) => {
   return (
     <div key={index} className="bg-gray-200 rounded-lg p-4 mb-4 flex">
       <div className="flex-1 space-y-2">
+        <p className="text-gray-600">ID: {guia.id}</p>
         <p className="text-gray-600">
           Nombre Rubro Cliente: {guia.rubro.nombre}
         </p>
         <p className="text-gray-600">Volumen de Carga: {guia.volumenCarga}</p>
         <p className="text-gray-600">
           Fecha:{" "}
-          {dayjs(guia.timestamp).utc("z").local().format("dddd, MMM D, H:mm")}
+          {dayjs(guia.timestamp).utc("z").local().format("dddd, MMM D, HH:mm")}
         </p>
         <p className="text-gray-600">Origen: {guia.origen}</p>
         <p className="text-gray-600">Destino: {guia.destino}</p>
@@ -28,7 +22,7 @@ const GuiaItem = ({ index, guia, handleCreateViaje }) => {
         {guia.viaje !== null ? (
           <button
             className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded ml-4"
-            onClick={handleVerViajeClick}
+            onClick={() => handleUpdateViaje(guia.viaje)}
           >
             Ver Viaje
           </button>
