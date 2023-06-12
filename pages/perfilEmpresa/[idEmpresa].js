@@ -12,6 +12,8 @@ import { HiOutlineTrash } from "react-icons/hi2";
 import GuiaItem from "@components/common/guiaItem";
 import GuiaForm from "@components/common/guiaForm";
 
+import ViajeForm from "@components/common/viajeForm";
+
 import dayjs from "dayjs";
 
 const customStyles = {
@@ -47,6 +49,7 @@ const PerfilEmpresa = () => {
   const [creatingVehicle, setCreatingVehicle] = useState(false);
   const [modifyingVehicle, setModifyingVehicle] = useState(null);
   const [creatingGuia, setCreatingGuia] = useState(false);
+  const [creatingViajeForGuia, setCreatingViajeForGuia] = useState(null);
 
   const router = useRouter();
   const { idEmpresa } = router.query;
@@ -80,6 +83,17 @@ const PerfilEmpresa = () => {
     await axios.post(`/empresas/${idEmpresa}/guias`, guia);
 
     setCreatingGuia(false);
+
+    getEmpresa();
+  };
+
+  const createViaje = async (guia) => {
+    await axios.post(
+      `/empresas/${idEmpresa}/guias/${creatingViajeForGuia.id}/viaje`,
+      guia
+    );
+
+    setCreatingViajeForGuia(null);
 
     getEmpresa();
   };
@@ -286,7 +300,13 @@ const PerfilEmpresa = () => {
                         </button>
                         <div>
                           {data.guias.map((guia, index) => (
-                            <GuiaItem key={index} guia={guia} />
+                            <GuiaItem
+                              key={index}
+                              guia={guia}
+                              handleCreateViaje={() =>
+                                setCreatingViajeForGuia(guia)
+                              }
+                            />
                           ))}
                         </div>
                       </div>
@@ -329,6 +349,21 @@ const PerfilEmpresa = () => {
       >
         <GuiaForm onSubmit={createGuia} />
       </Modal>
+
+      {data !== null && (
+        <Modal
+          isOpen={creatingViajeForGuia !== null}
+          onRequestClose={() => setCreatingViajeForGuia(null)}
+          contentLabel="Crear Viaje"
+          style={customStyles}
+        >
+          <ViajeForm
+            idEmpresa={idEmpresa}
+            choferes={data.choferes}
+            onSubmit={createViaje}
+          />
+        </Modal>
+      )}
     </div>
   );
 };

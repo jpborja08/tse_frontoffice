@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 import dayjs from "dayjs";
 
-const GuiaItem = ({ index, guia }) => {
+const GuiaItem = ({ index, guia, handleCreateViaje }) => {
   const router = useRouter();
 
   const handleVerViajeClick = () => {
@@ -33,7 +33,10 @@ const GuiaItem = ({ index, guia }) => {
             Ver Viaje
           </button>
         ) : (
-          <button className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded ml-4">
+          <button
+            onClick={handleCreateViaje}
+            className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded ml-4"
+          >
             Crear Viaje
           </button>
         )}
