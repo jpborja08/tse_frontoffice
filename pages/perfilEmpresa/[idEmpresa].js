@@ -111,9 +111,10 @@ const PerfilEmpresa = () => {
   };
 
   const updateViaje = async (viaje) => {
-    console.log(viaje);
-
-    // await axios.put(`/empresas/${idEmpresa}/guias/${modifyingViaje.guia.id}/viaje`, viaje);
+    await axios.put(
+      `/empresas/${idEmpresa}/guias/${modifyingViaje.guia.id}/viaje`,
+      viaje
+    );
 
     setModifyingViaje(null);
 

@@ -25,6 +25,10 @@ function GuiaForm({ idEmpresa, idGuia, onSubmit, choferes, viaje }) {
     const getVehiculosChofer = async () => {
       const { data } = await axios.get(`/choferes/${chofer}/vehiculos`);
       setVehiculosChofer(data);
+
+      if (data.find((v) => v.matricula === vehiculo) === undefined) {
+        setVehiculo(null);
+      }
     };
 
     getVehiculosChofer();
@@ -46,7 +50,7 @@ function GuiaForm({ idEmpresa, idGuia, onSubmit, choferes, viaje }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="border p-7 text-gray-700 w-[400px]"
+      className="border p-7 text-gray-700 w-[400px] min-h-[250px]"
     >
       <h2 className="font-bold text-xl mb-4 border-b pb-4">
         {viaje ? "Modificar viaje" : "Asignar viaje"}
@@ -76,6 +80,7 @@ function GuiaForm({ idEmpresa, idGuia, onSubmit, choferes, viaje }) {
               label: chofer,
             }}
             onChange={({ value }) => setChofer(value)}
+            maxMenuHeight={80}
           />
         </div>
         {vehiculosChofer !== null && (
@@ -94,6 +99,7 @@ function GuiaForm({ idEmpresa, idGuia, onSubmit, choferes, viaje }) {
                 label: vehiculo,
               }}
               onChange={({ value }) => setVehiculo(value)}
+              maxMenuHeight={80}
             />
           </div>
         )}
@@ -103,7 +109,7 @@ function GuiaForm({ idEmpresa, idGuia, onSubmit, choferes, viaje }) {
           </p>
         )}
       </div>
-      <div className="flex justify-end mt-4">
+      <div className="flex justify-end mt-10">
         <button
           className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded focus:outline-none focus:shadow-outline"
           type="submit"
