@@ -7,7 +7,9 @@ import Spinner from "@components/spinner";
 
 const PerfilUsuario = () => {
   const [data, setData] = useState(null);
+  const [nombreEmpresa, setNombreEmpresa] = useState(null);
   const router = useRouter();
+  const [userType, setUserType] = useState(null);
 
   const getUserInfo = async (token) => {
     try {
@@ -24,12 +26,17 @@ const PerfilUsuario = () => {
 
   useEffect(() => {
     const token = sessionStorage.getItem("token");
+    const userType = sessionStorage.getItem("userType");
+    setUserType(userType);
 
     if (!token) {
       router.push('/login');
     }
     else {;
       getUserInfo(token);
+      if (userType === "RESPONSABLE") {
+        setNombreEmpresa(JSON.parse(sessionStorage.getItem("empresa_responsable")).nombre);
+      }
     }
   }, []);
 
@@ -49,9 +56,9 @@ const PerfilUsuario = () => {
                   {data.tipo_documento?.nombre === "C.I." ?(
                     <p className="text-gray-600"><span className="font-semibold">Cédula de Identidad:</span> {data.numero_documento}</p>
                   ) : null}
-                  {/* {data.idEmpresa && (
-                    <p className="text-gray-600"><span className="font-semibold">Empresa de la cual es responsable:</span> {data.idEmpresa}</p>
-                  )} */}
+                  {nombreEmpresa &&(
+                    <p className="text-gray-600"><span className="font-semibold">Empresa de la cual es responsable:</span> {nombreEmpresa}</p>
+                  )}
                 </div>
             </div>
             ) : (

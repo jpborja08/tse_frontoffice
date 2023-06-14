@@ -25,7 +25,7 @@ const EmpresaForm = ({ onSubmit, initialData }) => {
           name="nombre"
           value={formData.nombre || ""}
           onChange={handleChange}
-          className="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none focus:border-blue-500"
+          className="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none focus:border-blue-500 text-black"
         />
       </div>
       <div className="mb-4">
@@ -38,7 +38,7 @@ const EmpresaForm = ({ onSubmit, initialData }) => {
           name="razonSocial"
           value={formData.razonSocial || ""}
           onChange={handleChange}
-          className="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none focus:border-blue-500"
+          className="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none focus:border-blue-500 text-black"
         />
       </div>
       <div className="mb-4">
@@ -51,7 +51,7 @@ const EmpresaForm = ({ onSubmit, initialData }) => {
           name="numero"
           value={formData.numero || ""}
           onChange={handleChange}
-          className="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none focus:border-blue-500"
+          className="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none focus:border-blue-500 text-black"
         />
       </div>
       <div className="mb-4">
@@ -64,7 +64,7 @@ const EmpresaForm = ({ onSubmit, initialData }) => {
           name="direccion"
           value={formData.direccion || ""}
           onChange={handleChange}
-          className="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none focus:border-blue-500"
+          className="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none focus:border-blue-500 text-black"
         />
       </div>
       <div className="mt-6">

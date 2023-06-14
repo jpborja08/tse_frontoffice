@@ -51,6 +51,10 @@ const PerfilEmpresa = () => {
   const [creatingGuia, setCreatingGuia] = useState(false);
   const [creatingViajeForGuia, setCreatingViajeForGuia] = useState(null);
   const [modifyingViaje, setModifyingViaje] = useState(null);
+  const [userType, setUserType] = useState(null);
+  const [assigningResponsable, setAssigningResponsable] = useState(false);
+  const [cedula, setCedula] = useState("");
+
 
   const router = useRouter();
   const { idEmpresa } = router.query;
@@ -62,6 +66,8 @@ const PerfilEmpresa = () => {
 
   useEffect(() => {
     const token = sessionStorage.getItem("token");
+    const userType = sessionStorage.getItem("userType");
+    setUserType(userType);
 
     if (!token) {
       router.push("/login");
@@ -127,6 +133,22 @@ const PerfilEmpresa = () => {
     getEmpresa();
   };
 
+  const handleAssignResponsable = async () => {
+    const requestBody = {
+      cedula: cedula,
+      empresaId: idEmpresa,
+    };
+  
+    try {
+      await axios.post("/empresas/asignar", requestBody);
+  
+      setAssigningResponsable(false);
+      getEmpresa();
+    } catch (error) {
+      console.error("Error assigning responsible:", error);
+    }
+  }
+
   return (
     <div className="bg-gray-100 min-h-screen">
       <div className="flex justify-center">
@@ -151,12 +173,70 @@ const PerfilEmpresa = () => {
                   <span className="font-semibold">Dirección Principal:</span>{" "}
                   {data.direccion}
                 </p>
+                {(userType === "FUNCIONARIO") && (
+                  <p>
+                    <span className="font-semibold">Cédula de responsable:</span>{" "}
+                    {data.responsable ? data.responsable.replace("uy-ci-", "") : "No asignado"}
+                  </p>
+                )}
+                {(userType === "FUNCIONARIO") && (
+                  <button
+                    className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mx-2"
+                    onClick={() => setAssigningResponsable(true)}
+                  >
+                    Asignar responsable
+                </button>
+                )}
                 <button
                   className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
                   onClick={() => router.push(`/editarEmpresa/${idEmpresa}`)}
                 >
                   Editar empresa
                 </button>
+                {assigningResponsable && (
+                  <Modal
+                    isOpen={assigningResponsable}
+                    onRequestClose={() => setAssigningResponsable(false)}
+                    contentLabel="Asignar Responsable"
+                    style={customStyles}
+                  >
+                    <div className="bg-white p-4">
+                      <h2 className="text-xl font-bold mb-4">Asignar Responsable</h2>
+                      <form
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          handleAssignResponsable();
+                        }}
+                      >
+                        <label className="block mb-2 text-black font-semibold">
+                          Cédula:
+                          <input
+                            type="text"
+                            className="border border-gray-300 px-2 py-1 w-full text-black"
+                            value={cedula}
+                            onChange={(e) => setCedula(e.target.value)}
+                            required
+                          />
+                        </label>
+                        <div className="flex justify-end mt-4">
+                          <button
+                            type="button"
+                            className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded mr-2"
+                            onClick={() => setAssigningResponsable(false)}
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="submit"
+                            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+                          >
+                            Submit
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </Modal>
+                )}
               </div>
               <div className="flex justify-center mt-8">
                 <div className="w-full">
