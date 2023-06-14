@@ -3,23 +3,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const DATA = [
-  {
-    idEmpresa: 1,
-    nombrePublico: 'Empresa A',
-    nroEmpresa: 12345,
-  },
-  {
-    idEmpresa: 2,
-    nombrePublico: 'Empresa B',
-    nroEmpresa: 67890,
-  },
-  {
-    idEmpresa: 3,
-    nombrePublico: 'Empresa C',
-    nroEmpresa: 54321,
-  },
-];
+import EmpresaForm from "@components/common/empresaForm";
 
 const EmpresaCard = ({ empresa }) => {
   return (
@@ -39,6 +23,7 @@ const EmpresaCard = ({ empresa }) => {
 
 const EmpresasPage = () => {
   const [empresas, setEmpresas] = useState([]);
+  const [showCreateForm, setShowCreateForm] = useState(false);
 
   useEffect(() => {
     const token = sessionStorage.getItem("token");
@@ -59,6 +44,20 @@ const EmpresasPage = () => {
     fetchEmpresas(token);
   }, []);
 
+  const handleCreateEmpresa = async (formData) => {
+    try {
+      const response = await axios.post('/empresas', formData);
+      setEmpresas([...empresas, response.data]);
+      setShowCreateForm(false);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleCancelCreate = () => {
+    setShowCreateForm(false);
+  };
+
   return (
     <div className="bg-gray-100 min-h-screen">
       <div className="flex justify-center">
@@ -67,6 +66,29 @@ const EmpresasPage = () => {
           {empresas.map((empresa) => (
             <EmpresaCard key={empresa.id} empresa={empresa} />
           ))}
+          <div className="flex justify-end mt-6">
+            {!showCreateForm && (
+              <button
+                className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+                onClick={() => setShowCreateForm(true)}
+              >
+                Crear Empresa
+              </button>
+            )}
+          </div>
+          {showCreateForm && (
+            <div className="mt-6">
+              <EmpresaForm onSubmit={handleCreateEmpresa} />
+              <div className="flex justify-end mt-4">
+                <button
+                  className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
+                  onClick={handleCancelCreate}
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

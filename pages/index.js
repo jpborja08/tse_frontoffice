@@ -36,6 +36,11 @@ export default function Home( { req, res } ) {
           }
         );
         const token = response.data.access_token;
+        const userType = response.data.type;
+        if (userType === "RESPONSABLE") {
+          sessionStorage.setItem("empresa_responsable", JSON.stringify(response.data.empresa_representada));
+        }
+        sessionStorage.setItem("userType", userType);
         sessionStorage.setItem("token", token);
         setToken(token);
         setAuthToken(token);
