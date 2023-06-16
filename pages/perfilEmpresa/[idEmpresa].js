@@ -8,6 +8,8 @@ import axios from "axios";
 import Modal from "react-modal";
 import VehiculoForm from "@components/common/vehiculoForm";
 import { HiOutlineTrash } from "react-icons/hi2";
+import { HiOutlineCheck, HiOutlineX } from "react-icons/hi";
+import clsx from "clsx";
 
 import GuiaItem from "@components/common/guiaItem";
 import GuiaForm from "@components/common/guiaForm";
@@ -43,6 +45,18 @@ const customStyles = {
   },
 };
 
+const vehiculoStatusColor = {
+  PENDING: "bg-gray-100",
+  REJECTED: "bg-red-100",
+  APPROVED: "bg-green-100",
+};
+
+const vehiculoStatusMsg = {
+  PENDING: "Pendiente de aprobación...",
+  REJECTED: "Rechazado",
+  APPROVED: "Aprobado",
+};
+
 const PerfilEmpresa = () => {
   const [activeTab, setActiveTab] = useState("vehiculos");
   const [data, setData] = useState(null);
@@ -54,7 +68,6 @@ const PerfilEmpresa = () => {
   const [userType, setUserType] = useState(null);
   const [assigningResponsable, setAssigningResponsable] = useState(false);
   const [cedula, setCedula] = useState("");
-
 
   const router = useRouter();
   const { idEmpresa } = router.query;
@@ -138,16 +151,16 @@ const PerfilEmpresa = () => {
       cedula: cedula,
       empresaId: idEmpresa,
     };
-  
+
     try {
       await axios.post("/empresas/asignar", requestBody);
-  
+
       setAssigningResponsable(false);
       getEmpresa();
     } catch (error) {
       console.error("Error assigning responsible:", error);
     }
-  }
+  };
 
   return (
     <div className="bg-gray-100 min-h-screen">
@@ -173,19 +186,23 @@ const PerfilEmpresa = () => {
                   <span className="font-semibold">Dirección Principal:</span>{" "}
                   {data.direccion}
                 </p>
-                {(userType === "FUNCIONARIO") && (
+                {userType === "FUNCIONARIO" && (
                   <p>
-                    <span className="font-semibold">Cédula de responsable:</span>{" "}
-                    {data.responsable ? data.responsable.replace("uy-ci-", "") : "No asignado"}
+                    <span className="font-semibold">
+                      Cédula de responsable:
+                    </span>{" "}
+                    {data.responsable
+                      ? data.responsable.replace("uy-ci-", "")
+                      : "No asignado"}
                   </p>
                 )}
-                {(userType === "FUNCIONARIO") && (
+                {userType === "FUNCIONARIO" && (
                   <button
                     className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mx-2"
                     onClick={() => setAssigningResponsable(true)}
                   >
                     Asignar responsable
-                </button>
+                  </button>
                 )}
                 <button
                   className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
@@ -201,7 +218,9 @@ const PerfilEmpresa = () => {
                     style={customStyles}
                   >
                     <div className="bg-white p-4">
-                      <h2 className="text-xl font-bold mb-4">Asignar Responsable</h2>
+                      <h2 className="text-xl font-bold mb-4">
+                        Asignar Responsable
+                      </h2>
                       <form
                         onSubmit={(e) => {
                           e.preventDefault();
@@ -292,69 +311,104 @@ const PerfilEmpresa = () => {
                         {data.vehiculos.map((vehiculo, index) => (
                           <div
                             key={index}
-                            className="bg-gray-200 rounded-lg p-4 mb-4"
+                            className={clsx(
+                              "bg-gray-200 rounded-lg p-4 mb-4",
+                              vehiculoStatusColor[vehiculo.status]
+                            )}
                           >
-                            <p className="text-gray-600">
-                              <span className="font-semibold">Matrícula:</span>{" "}
-                              {vehiculo.matricula}
-                            </p>
-                            <p className="text-gray-600">
-                              <span className="font-semibold">Marca:</span>{" "}
-                              {vehiculo.marca}
-                            </p>
-                            <p className="text-gray-600">
-                              <span className="font-semibold">Modelo:</span>{" "}
-                              {vehiculo.modelo}
-                            </p>
-                            <p className="text-gray-600">
-                              <span className="font-semibold">Peso:</span>{" "}
-                              {vehiculo.peso}
-                            </p>
-                            <p className="text-gray-600">
-                              <span className="font-semibold">
-                                Capacidad de carga:
-                              </span>{" "}
-                              {vehiculo.capacidad}
-                            </p>
-                            <p className="text-gray-600">
-                              <span className="font-semibold">
-                                Numero de Permiso:
-                              </span>{" "}
-                              {vehiculo.numeroPermiso}
-                            </p>
-                            <p className="text-gray-600">
-                              <span className="font-semibold">
-                                Validéz de permiso:
-                              </span>{" "}
-                              {dayjs(vehiculo.fechaExpiracionPermiso)
-                                .utc("z")
-                                .local()
-                                .format("dddd, MMM D")}
-                            </p>
-                            <p className="text-gray-600">
-                              <span className="font-semibold">
-                                Fecha de inspección:
-                              </span>{" "}
-                              {dayjs(vehiculo.fechaInspeccion)
-                                .utc("z")
-                                .local()
-                                .format("dddd, MMM D")}
-                            </p>
-                            <div className="flex items-center justify-between mt-4">
-                              <button
-                                className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
-                                onClick={() => setModifyingVehicle(vehiculo)}
-                              >
-                                Modificar vehiculo
-                              </button>
+                            <div className="flex items-stretch justify-between">
+                              <div>
+                                <p className="text-gray-600">
+                                  <span className="font-semibold">
+                                    Matrícula:
+                                  </span>{" "}
+                                  {vehiculo.matricula}
+                                </p>
+                                <p className="text-gray-600">
+                                  <span className="font-semibold">Marca:</span>{" "}
+                                  {vehiculo.marca}
+                                </p>
+                                <p className="text-gray-600">
+                                  <span className="font-semibold">Modelo:</span>{" "}
+                                  {vehiculo.modelo}
+                                </p>
+                                <p className="text-gray-600">
+                                  <span className="font-semibold">Peso:</span>{" "}
+                                  {vehiculo.peso}
+                                </p>
+                                <p className="text-gray-600">
+                                  <span className="font-semibold">
+                                    Capacidad de carga:
+                                  </span>{" "}
+                                  {vehiculo.capacidad}
+                                </p>
+                                <p className="text-gray-600">
+                                  <span className="font-semibold">
+                                    Numero de Permiso:
+                                  </span>{" "}
+                                  {vehiculo.numeroPermiso}
+                                </p>
+                                <p className="text-gray-600">
+                                  <span className="font-semibold">
+                                    Validéz de permiso:
+                                  </span>{" "}
+                                  {dayjs(vehiculo.fechaExpiracionPermiso)
+                                    .utc("z")
+                                    .local()
+                                    .format("dddd, MMM D")}
+                                </p>
+                                <p className="text-gray-600">
+                                  <span className="font-semibold">
+                                    Fecha de inspección:
+                                  </span>{" "}
+                                  {dayjs(vehiculo.fechaInspeccion)
+                                    .utc("z")
+                                    .local()
+                                    .format("dddd, MMM D")}
+                                </p>
+                              </div>
+                              <div className="flex flex-col items-end justify-between">
+                                <button
+                                  onClick={() =>
+                                    deleteVehicle(vehiculo.matricula)
+                                  }
+                                >
+                                  <HiOutlineTrash className="text-red-500 text-xl" />
+                                </button>
+                              </div>
+                            </div>
+                            <div
+                              className={clsx(
+                                "flex items-center justify-between",
+                                { "mt-4": vehiculo.status !== "APPROVED" }
+                              )}
+                            >
+                              {vehiculo.status !== "APPROVED" ? (
+                                <button
+                                  className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+                                  onClick={() => setModifyingVehicle(vehiculo)}
+                                >
+                                  Modificar vehiculo
+                                </button>
+                              ) : (
+                                <span></span>
+                              )}
 
-                              <button
-                                onClick={() =>
-                                  deleteVehicle(vehiculo.matricula)
-                                }
-                              >
-                                <HiOutlineTrash className="text-red-500 text-xl" />
-                              </button>
+                              <div className="flex items-center space-x-2">
+                                <p className="text-gray-700 text-sm">
+                                  {vehiculoStatusMsg[vehiculo.status]}
+                                </p>
+                                {vehiculo.status === "APPROVED" && (
+                                  <div className="bg-green-500 rounded-full p-1">
+                                    <HiOutlineCheck className="text-white" />
+                                  </div>
+                                )}
+                                {vehiculo.status === "REJECTED" && (
+                                  <div className="bg-red-500 rounded-full p-1">
+                                    <HiOutlineX className="text-white" />
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
                         ))}
