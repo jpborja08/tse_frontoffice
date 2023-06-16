@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Select from "react-select";
-import DateTimePicker from "./datetimePicker";
+import DateTimePicker from "./dateTimePicker";
 
 function GuiaForm({ idEmpresa, onSubmit, initialData }) {
   const [isFormValid, setFormValid] = useState(true);

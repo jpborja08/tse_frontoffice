@@ -1,7 +1,28 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
+import Spinner from "@components/spinner";
+import { v4 as uuidv4 } from "uuid";
+import { HiArrowUpTray } from "react-icons/hi2";
+import clsx from "clsx";
 
-function VehiculoForm({ title, idEmpresa, onSubmit, initialData }) {
+const statusMsg = {
+  PENDING: "Pendiente de aprobación",
+  REJECTED: "Rechazado",
+  APPROVED: "Aprobado",
+};
+
+const statusColor = {
+  PENDING: "bg-gray-100",
+  REJECTED: "bg-red-200",
+  APPROVED: "bg-green-300",
+};
+
+function VehiculoForm({ idEmpresa, onSubmit, initialData }) {
   const [isFormValid, setFormValid] = useState(true);
+  const [uploadData, setUploadData] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [filename, setFilename] = useState(null);
+  const fileInput = useRef(null);
 
   const [formData, setFormData] = useState({
     empresaId: idEmpresa || "",
@@ -14,7 +35,17 @@ function VehiculoForm({ title, idEmpresa, onSubmit, initialData }) {
     fechaExpiracionPermiso: "",
     fechaInspeccion: "",
     choferesCedula: [],
+    itvPath: "",
   });
+
+  useEffect(() => {
+    const getUploadData = async () => {
+      const { data } = await axios.get("/vehiculos/data");
+      setUploadData(data);
+    };
+
+    getUploadData();
+  }, []);
 
   useEffect(() => {
     if (initialData) {
@@ -29,10 +60,45 @@ function VehiculoForm({ title, idEmpresa, onSubmit, initialData }) {
         fechaExpiracionPermiso:
           initialData.fechaExpiracionPermiso.split("T")[0],
         fechaInspeccion: initialData.fechaInspeccion.split("T")[0],
+        itvPath: initialData.itvPath,
         choferesCedula: [],
       });
     }
   }, [initialData]);
+
+  const onFileChange = async (event) => {
+    const file = event.target.files[0];
+    setFilename(file.name);
+    const extension = file.name.split(".").pop();
+    const filename = `${uuidv4()}.${extension}`;
+
+    const uploadUrl = `${uploadData.baseUrl}/${filename}?${uploadData.token}`;
+
+    const formData = new FormData();
+    formData.append("file", file, filename);
+
+    setUploading(true);
+
+    try {
+      await axios.put(uploadUrl, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          "x-ms-blob-type": "BlockBlob",
+        },
+        transformRequest: (data, headers) => {
+          delete headers.Authorization;
+          return data;
+        },
+      });
+
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        itvPath: filename,
+      }));
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleChange = (e) => {
     let { name, value } = e.target;
@@ -44,6 +110,8 @@ function VehiculoForm({ title, idEmpresa, onSubmit, initialData }) {
   };
 
   const handleSubmit = (e) => {
+    if (uploading) return;
+
     e.preventDefault();
     if (Object.values(formData).some((value) => value === "")) {
       setFormValid(false);
@@ -56,6 +124,10 @@ function VehiculoForm({ title, idEmpresa, onSubmit, initialData }) {
       fechaInspeccion: `${formData.fechaInspeccion}T00:00:00`,
     });
   };
+
+  if (uploadData === null) {
+    <Spinner />;
+  }
 
   return (
     <form onSubmit={handleSubmit} className="border p-7 text-gray-700">
@@ -125,7 +197,7 @@ function VehiculoForm({ title, idEmpresa, onSubmit, initialData }) {
             required
           />
         </div>
-        <div className="mb-4">
+        <div className="mb-4 break-inside-avoid">
           <label
             className="block text-sm font-bold mb-2"
             htmlFor="capacidad_carga"
@@ -195,6 +267,58 @@ function VehiculoForm({ title, idEmpresa, onSubmit, initialData }) {
             onChange={handleChange}
             required
           />
+        </div>
+        <div className="mb-5">
+          <label className="block text-sm font-bold mb-2" htmlFor="itv">
+            Inspección Técnica Vehicular
+          </label>
+          <input
+            ref={fileInput}
+            id="itv"
+            type="file"
+            hidden
+            onChange={onFileChange}
+            accept=".pdf"
+          />
+          <div className="flex items-center space-x-3">
+            <button
+              type="button"
+              onClick={() => fileInput.current.click()}
+              className="bg-gray-400 text-white rounded p-1"
+            >
+              <HiArrowUpTray className="text-xl" />
+            </button>
+            {uploading ? (
+              <Spinner />
+            ) : (
+              <p className="text-sm w-full truncate">
+                {filename
+                  ? filename
+                  : formData.itvPath
+                  ? `${formData.itvPath.slice(0, 5)}...${formData.itvPath.slice(
+                      formData.itvPath.length - 8
+                    )}`
+                  : "Subir archivo"}
+              </p>
+            )}
+          </div>
+
+          {initialData ? (
+            <div className="mt-5">
+              <label className="block text-sm font-bold mb-2">Estado</label>
+              <input
+                className={clsx(
+                  "appearance-none border rounded w-full py-2.5 px-3 leading-tight focus:outline-none focus:shadow-outline text-sm",
+                  statusColor[initialData.status]
+                )}
+                type="text"
+                disabled={true}
+                value={statusMsg[initialData.status]}
+              />
+            </div>
+          ) : (
+            <span className="py-6 block" id="xd"></span>
+          )}
         </div>
         {!isFormValid && (
           <p className="text-red-500 text-sm mb-2">
