@@ -1,5 +1,5 @@
 import "tailwindcss/tailwind.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
 import { useRouter } from "next/router";
@@ -7,9 +7,10 @@ import Spinner from "@components/spinner";
 import axios from "axios";
 import Modal from "react-modal";
 import VehiculoForm from "@components/common/vehiculoForm";
-import { HiOutlineTrash } from "react-icons/hi2";
+import { HiOutlineTrash, HiArrowDownTray } from "react-icons/hi2";
 import { HiOutlineCheck, HiOutlineX } from "react-icons/hi";
 import clsx from "clsx";
+import AuthContext from "@lib/context";
 
 import GuiaItem from "@components/common/guiaItem";
 import GuiaForm from "@components/common/guiaForm";
@@ -68,6 +69,11 @@ const PerfilEmpresa = () => {
   const [userType, setUserType] = useState(null);
   const [assigningResponsable, setAssigningResponsable] = useState(false);
   const [cedula, setCedula] = useState("");
+  const { token, setToken } = useContext(AuthContext);
+
+  useEffect(() => {
+    setUserType(sessionStorage.getItem("userType"));
+  }, [token]);
 
   const router = useRouter();
   const { idEmpresa } = router.query;
@@ -160,6 +166,12 @@ const PerfilEmpresa = () => {
     } catch (error) {
       console.error("Error assigning responsible:", error);
     }
+  };
+
+  const updateStatusVehiculo = async (matricula, status) => {
+    await axios.put(`/vehiculos/${matricula}/status`, { status });
+
+    getEmpresa();
   };
 
   return (
@@ -295,12 +307,14 @@ const PerfilEmpresa = () => {
 
                     <TabPanel>
                       <div>
-                        <button
-                          onClick={() => setCreatingVehicle(true)}
-                          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mb-4"
-                        >
-                          Dar de alta vehiculo
-                        </button>
+                        {userType === "RESPONSABLE" && (
+                          <button
+                            onClick={() => setCreatingVehicle(true)}
+                            className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mb-4"
+                          >
+                            Dar de alta vehiculo
+                          </button>
+                        )}
 
                         {data.vehiculos.length === 0 && (
                           <p className="text-gray-600">
@@ -366,16 +380,34 @@ const PerfilEmpresa = () => {
                                     .local()
                                     .format("dddd, MMM D")}
                                 </p>
+                                {["FUNCIONARIO", "RESPONSABLE"].includes(
+                                  userType
+                                ) && (
+                                  <div className="text-gray-600 flex items-center space-x-2">
+                                    <span className="font-semibold">
+                                      Inspección técnica vehicular:
+                                    </span>
+
+                                    <a
+                                      href={vehiculo.itvUrl}
+                                      className="flex items-center space-x-2 text-lg"
+                                    >
+                                      <HiArrowDownTray />
+                                    </a>
+                                  </div>
+                                )}
                               </div>
-                              <div className="flex flex-col items-end justify-between">
-                                <button
-                                  onClick={() =>
-                                    deleteVehicle(vehiculo.matricula)
-                                  }
-                                >
-                                  <HiOutlineTrash className="text-red-500 text-xl" />
-                                </button>
-                              </div>
+                              {userType === "RESPONSABLE" && (
+                                <div className="flex flex-col items-end justify-between">
+                                  <button
+                                    onClick={() =>
+                                      deleteVehicle(vehiculo.matricula)
+                                    }
+                                  >
+                                    <HiOutlineTrash className="text-red-500 text-xl" />
+                                  </button>
+                                </div>
+                              )}
                             </div>
                             <div
                               className={clsx(
@@ -383,7 +415,8 @@ const PerfilEmpresa = () => {
                                 { "mt-4": vehiculo.status !== "APPROVED" }
                               )}
                             >
-                              {vehiculo.status !== "APPROVED" ? (
+                              {vehiculo.status !== "APPROVED" &&
+                              userType === "RESPONSABLE" ? (
                                 <button
                                   className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
                                   onClick={() => setModifyingVehicle(vehiculo)}
@@ -391,8 +424,41 @@ const PerfilEmpresa = () => {
                                   Modificar vehiculo
                                 </button>
                               ) : (
-                                <span></span>
+                                <>
+                                  {(userType !== "FUNCIONARIO" ||
+                                    vehiculo.status !== "PENDING") && (
+                                    <span></span>
+                                  )}
+                                </>
                               )}
+
+                              {userType === "FUNCIONARIO" &&
+                                vehiculo.status === "PENDING" && (
+                                  <div className="flex items-center space-x-3">
+                                    <button
+                                      className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+                                      onClick={() =>
+                                        updateStatusVehiculo(
+                                          vehiculo.matricula,
+                                          "APPROVED"
+                                        )
+                                      }
+                                    >
+                                      Aprobar
+                                    </button>
+                                    <button
+                                      className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+                                      onClick={() =>
+                                        updateStatusVehiculo(
+                                          vehiculo.matricula,
+                                          "REJECTED"
+                                        )
+                                      }
+                                    >
+                                      Rechazar
+                                    </button>
+                                  </div>
+                                )}
 
                               <div className="flex items-center space-x-2">
                                 <p className="text-gray-700 text-sm">
