@@ -298,7 +298,7 @@ function VehiculoForm({ idEmpresa, onSubmit, initialData }) {
                   ? `${formData.itvPath.slice(0, 5)}...${formData.itvPath.slice(
                       formData.itvPath.length - 8
                     )}`
-                  : "Subir archivo"}
+                  : "Subir documento"}
               </p>
             )}
           </div>
