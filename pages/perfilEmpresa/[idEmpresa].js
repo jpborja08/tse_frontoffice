@@ -1,5 +1,5 @@
 import "tailwindcss/tailwind.css";
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useMemo } from "react";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
 import { useRouter } from "next/router";
@@ -174,6 +174,14 @@ const PerfilEmpresa = () => {
     getEmpresa();
   };
 
+  const soyResponsable = useMemo(
+    () =>
+      userType === "RESPONSABLE" &&
+      JSON.parse(sessionStorage.getItem("empresa_responsable"))?.id ==
+        idEmpresa,
+    [userType]
+  );
+
   return (
     <div className="bg-gray-100 min-h-screen">
       <div className="flex justify-center">
@@ -307,7 +315,7 @@ const PerfilEmpresa = () => {
 
                     <TabPanel>
                       <div>
-                        {userType === "RESPONSABLE" && (
+                        {soyResponsable && (
                           <button
                             onClick={() => setCreatingVehicle(true)}
                             className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mb-4"
@@ -380,9 +388,8 @@ const PerfilEmpresa = () => {
                                     .local()
                                     .format("dddd, MMM D")}
                                 </p>
-                                {["FUNCIONARIO", "RESPONSABLE"].includes(
-                                  userType
-                                ) && (
+                                {(userType === "FUNCIONARIO" ||
+                                  soyResponsable) && (
                                   <div className="text-gray-600 flex items-center space-x-2">
                                     <span className="font-semibold">
                                       Inspección técnica vehicular:
@@ -397,7 +404,7 @@ const PerfilEmpresa = () => {
                                   </div>
                                 )}
                               </div>
-                              {userType === "RESPONSABLE" && (
+                              {soyResponsable && (
                                 <div className="flex flex-col items-end justify-between">
                                   <button
                                     onClick={() =>
@@ -416,7 +423,7 @@ const PerfilEmpresa = () => {
                               )}
                             >
                               {vehiculo.status !== "APPROVED" &&
-                              userType === "RESPONSABLE" ? (
+                              soyResponsable ? (
                                 <button
                                   className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
                                   onClick={() => setModifyingVehicle(vehiculo)}
