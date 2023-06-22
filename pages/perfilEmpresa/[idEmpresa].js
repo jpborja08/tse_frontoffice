@@ -16,6 +16,7 @@ import GuiaItem from "@components/common/guiaItem";
 import GuiaForm from "@components/common/guiaForm";
 
 import ViajeForm from "@components/common/viajeForm";
+import ChoferForm from "@components/common/choferForm";
 
 import dayjs from "dayjs";
 
@@ -70,6 +71,7 @@ const PerfilEmpresa = () => {
   const [assigningResponsable, setAssigningResponsable] = useState(false);
   const [cedula, setCedula] = useState("");
   const { token, setToken } = useContext(AuthContext);
+  const [creatingChofer, setCreatingChofer] = useState(false);
 
   useEffect(() => {
     setUserType(sessionStorage.getItem("userType"));
@@ -96,6 +98,12 @@ const PerfilEmpresa = () => {
       getEmpresa();
     }
   }, [idEmpresa]);
+
+  const createChofer = async (chofer) => {
+    await axios.post(`/empresas/${idEmpresa}/choferes`, chofer);
+    setCreatingChofer(false);
+    getEmpresa();
+  };
 
   const createVehicle = async (vehiculo) => {
     await axios.post("/vehiculos", vehiculo);
@@ -490,6 +498,12 @@ const PerfilEmpresa = () => {
 
                     <TabPanel>
                       <div>
+                      <button
+                        onClick={() => setCreatingChofer(true)}
+                        className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mb-4"
+                      >
+                        Agregar Chofer
+                      </button>
                         {data.choferes.length === 0 && (
                           <p className="text-gray-600">
                             No hay choferes registrados
@@ -576,6 +590,15 @@ const PerfilEmpresa = () => {
         style={customStyles}
       >
         <GuiaForm onSubmit={createGuia} />
+      </Modal>
+
+      <Modal
+        isOpen={creatingChofer}
+        onRequestClose={() => setCreatingChofer(false)}
+        contentLabel="Agregar Chofer"
+        style={customStyles}
+      >
+        <ChoferForm onSubmit={createChofer} />
       </Modal>
 
       {data !== null && (
