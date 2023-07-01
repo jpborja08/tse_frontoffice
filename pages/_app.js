@@ -18,7 +18,7 @@ dayjs.Ls.en.weekStart = 1;
 
 axios.defaults.baseURL = process.env.NEXT_PUBLIC_API_URL;
 
-const SESSION_TIMEOUT = 60 * 60 * 1000; // 60 minutes in milliseconds
+const SESSION_TIMEOUT = 50 * 60 * 1000; // 50 minutes in milliseconds
 
 export default function MyApp({ Component, pageProps }) {
   const [token, setToken] = useState(null);

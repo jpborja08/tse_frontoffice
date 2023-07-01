@@ -18,12 +18,17 @@ function GuiaForm({ idEmpresa, idGuia, onSubmit, choferes, viaje }) {
   }, [viaje]);
 
   useEffect(() => {
+    const token = sessionStorage.getItem("token");
     if (chofer === null) {
       return;
     }
 
     const getVehiculosChofer = async () => {
-      const { data } = await axios.get(`/choferes/${chofer}/vehiculos`);
+      const { data } = await axios.get(`/choferes/${chofer}/vehiculos`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setVehiculosChofer(data);
 
       if (data.find((v) => v.matricula === vehiculo) === undefined) {

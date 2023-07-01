@@ -24,8 +24,13 @@ function GuiaForm({ idEmpresa, onSubmit, initialData }) {
   }, [initialData]);
 
   useEffect(() => {
+    const token = sessionStorage.getItem("token");
     const getInfo = async () => {
-      const { data } = await axios.get(`/empresas/${idEmpresa}/guias/data`);
+      const { data } = await axios.get(`/empresas/${idEmpresa}/guias/data`,{
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setRubros(data.rubros);
       setTiposCarga(data.tiposCarga);
     };

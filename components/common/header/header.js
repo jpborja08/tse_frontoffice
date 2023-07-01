@@ -13,6 +13,9 @@ const HeaderComponent = () => {
   const [idEmpresa, setIdEmpresa] = useState(null);
 
   useEffect(() => {
+    if (!token) {
+      setToken(sessionStorage.getItem("token"));
+    }
     setShowLogoutButton(typeof window !== "undefined" && token);
     const userType = sessionStorage.getItem("userType");
     setUserType(userType);
@@ -70,6 +73,11 @@ const HeaderComponent = () => {
           {(userType === "FUNCIONARIO") && (
             <Link href="/empresas" passHref className="text-gray-300 hover:text-white hover:border-b-2 hover:border-white ml-6">
               Empresas
+            </Link>
+          )}
+          {(userType === "FUNCIONARIO") && (
+            <Link href="/monitoreoDeViajes" passHref className="text-gray-300 hover:text-white hover:border-b-2 hover:border-white ml-6">
+              Monitoreo de viajes
             </Link>
           )}
           <Link href="/publicaciones" passHref className="text-gray-300 hover:text-white hover:border-b-2 hover:border-white ml-6">
