@@ -1,7 +1,7 @@
 import "tailwindcss/tailwind.css";
-import Link from 'next/link';
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import Link from "next/link";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
 import EmpresaForm from "@components/common/empresaForm";
 
@@ -14,7 +14,11 @@ const EmpresaCard = ({ empresa }) => {
       <p className="text-gray-600">
         <span className="font-semibold">Nro. Empresa:</span> {empresa.numero}
       </p>
-      <Link href={`/perfilEmpresa/${empresa.id}`} passHref className="text-blue-500 hover:underline">
+      <Link
+        href={`/perfilEmpresa/${empresa.id}`}
+        passHref
+        className="text-blue-500 hover:underline"
+      >
         Ver Perfil
       </Link>
     </div>
@@ -23,34 +27,38 @@ const EmpresaCard = ({ empresa }) => {
 
 const EmpresasPage = () => {
   const [empresas, setEmpresas] = useState([]);
+  const [error, setError] = useState(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
 
   useEffect(() => {
-    const token = sessionStorage.getItem("token");
-
-    const fetchEmpresas = async (token) => {
-      try {
-        const response = await axios.get('/empresas', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setEmpresas(response.data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchEmpresas(token);
+    fetchEmpresas();
   }, []);
+
+  const fetchEmpresas = async () => {
+    try {
+      const response = await axios.get("/empresas", {
+        headers: {
+          Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+        },
+      });
+      setEmpresas(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const handleCreateEmpresa = async (formData) => {
     try {
-      const response = await axios.post('/empresas', formData);
-      setEmpresas([...empresas, response.data]);
+      setError(null);
+      const response = await axios.post("/empresas", formData);
+      fetchEmpresas();
       setShowCreateForm(false);
     } catch (error) {
-      console.error(error);
+      setError(
+        error?.response?.data?.includes("transaction")
+          ? "Se rompio todo gurise quiero que lo sepan"
+          : error.response.data
+      );
     }
   };
 
@@ -62,7 +70,9 @@ const EmpresasPage = () => {
     <div className="bg-gray-100 min-h-screen">
       <div className="flex justify-center">
         <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-md mt-4">
-          <h1 className="text-3xl font-bold mb-8 text-gray-600 text-center">Empresas</h1>
+          <h1 className="text-3xl font-bold mb-8 text-gray-600 text-center">
+            Empresas
+          </h1>
           {empresas.map((empresa) => (
             <EmpresaCard key={empresa.id} empresa={empresa} />
           ))}
@@ -78,7 +88,7 @@ const EmpresasPage = () => {
           </div>
           {showCreateForm && (
             <div className="mt-6">
-              <EmpresaForm onSubmit={handleCreateEmpresa} />
+              <EmpresaForm onSubmit={handleCreateEmpresa} error={error} />
               <div className="flex justify-end mt-4">
                 <button
                   className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Modal from "react-modal";
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 
 import Header from "@components/common/header/header";
 import { setAuthToken } from "@lib/session";
@@ -32,9 +32,8 @@ export default function MyApp({ Component, pageProps }) {
       setAuthToken(token);
       setToken(token);
       startLogoutTimer();
-    }
-    else {
-      router.push('/login');
+    } else {
+      router.push("/login");
     }
   }, []);
 
@@ -42,7 +41,7 @@ export default function MyApp({ Component, pageProps }) {
     clearTimeout(logoutTimer);
 
     logoutTimer = setTimeout(() => {
-      sessionStorage.removeItem('token');
+      sessionStorage.removeItem("token");
     }, SESSION_TIMEOUT);
   };
 
@@ -53,8 +52,8 @@ export default function MyApp({ Component, pageProps }) {
 
   const handleLogout = () => {
     clearTimeout(logoutTimer);
-    sessionStorage.removeItem('token');
-    router.push('/login');
+    sessionStorage.removeItem("token");
+    router.push("/login");
   };
 
   useEffect(() => {
@@ -62,12 +61,12 @@ export default function MyApp({ Component, pageProps }) {
       resetLogoutTimer();
     };
 
-    window.addEventListener('mousemove', resetTimerOnUserActivity);
-    window.addEventListener('keydown', resetTimerOnUserActivity);
+    window.addEventListener("mousemove", resetTimerOnUserActivity);
+    window.addEventListener("keydown", resetTimerOnUserActivity);
 
     return () => {
-      window.removeEventListener('mousemove', resetTimerOnUserActivity);
-      window.removeEventListener('keydown', resetTimerOnUserActivity);
+      window.removeEventListener("mousemove", resetTimerOnUserActivity);
+      window.removeEventListener("keydown", resetTimerOnUserActivity);
     };
   }, []);
 

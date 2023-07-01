@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const EmpresaForm = ({ onSubmit, initialData }) => {
+const EmpresaForm = ({ onSubmit, initialData, error }) => {
   const [formData, setFormData] = useState(initialData || {});
 
   const handleChange = (e) => {
@@ -29,7 +29,10 @@ const EmpresaForm = ({ onSubmit, initialData }) => {
         />
       </div>
       <div className="mb-4">
-        <label htmlFor="razonSocial" className="block text-gray-600 font-semibold">
+        <label
+          htmlFor="razonSocial"
+          className="block text-gray-600 font-semibold"
+        >
           Razón Social
         </label>
         <input
@@ -55,7 +58,10 @@ const EmpresaForm = ({ onSubmit, initialData }) => {
         />
       </div>
       <div className="mb-4">
-        <label htmlFor="direccion" className="block text-gray-600 font-semibold">
+        <label
+          htmlFor="direccion"
+          className="block text-gray-600 font-semibold"
+        >
           Dirección Principal
         </label>
         <input
@@ -67,6 +73,9 @@ const EmpresaForm = ({ onSubmit, initialData }) => {
           className="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none focus:border-blue-500 text-black"
         />
       </div>
+      {error && (
+        <div className="bg-red-500 text-white p-3 mb-4 rounded">{error}</div>
+      )}
       <div className="mt-6">
         <button
           type="submit"
