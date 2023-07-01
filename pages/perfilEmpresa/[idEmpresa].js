@@ -72,23 +72,37 @@ const PerfilEmpresa = () => {
   const [cedula, setCedula] = useState("");
   const { token, setToken } = useContext(AuthContext);
   const [creatingChofer, setCreatingChofer] = useState(false);
+  const [idEmpresa, setIdEmpresa] = useState(null);
 
   useEffect(() => {
     setUserType(sessionStorage.getItem("userType"));
   }, [token]);
 
   const router = useRouter();
-  const { idEmpresa } = router.query;
 
   const getEmpresa = async () => {
-    const res = await axios.get(`/empresas/${idEmpresa}`);
+    const res = await axios.get(`/empresas/${idEmpresa}`,{
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     setData(res.data);
   };
 
   useEffect(() => {
+    if (router.query.idEmpresa) {
+      setIdEmpresa(router.query.idEmpresa);
+    }
+  }, [router.query.idEmpresa]);
+
+  useEffect(() => {
+    setIdEmpresa(router.query.idEmpresa);
     const token = sessionStorage.getItem("token");
     const userType = sessionStorage.getItem("userType");
     setUserType(userType);
+    if (userType === "RESPONSABLE") {
+      setIdEmpresa(JSON.parse(sessionStorage.getItem("empresa_responsable")).id);
+    };
 
     if (!token) {
       router.push("/login");
@@ -100,7 +114,11 @@ const PerfilEmpresa = () => {
   }, [idEmpresa]);
 
   const createChofer = async (chofer) => {
-    await axios.post(`/empresas/${idEmpresa}/choferes`, chofer);
+    await axios.post(`/empresas/${idEmpresa}/choferes`, chofer,{
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     setCreatingChofer(false);
     getEmpresa();
   };
@@ -114,7 +132,11 @@ const PerfilEmpresa = () => {
   };
 
   const createGuia = async (guia) => {
-    await axios.post(`/empresas/${idEmpresa}/guias`, guia);
+    await axios.post(`/empresas/${idEmpresa}/guias`, guia,{
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     setCreatingGuia(false);
 
@@ -125,7 +147,11 @@ const PerfilEmpresa = () => {
     await axios.post(
       `/empresas/${idEmpresa}/guias/${creatingViajeForGuia.id}/viaje`,
       guia
-    );
+      ,{
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+    });
 
     setCreatingViajeForGuia(null);
 
@@ -136,7 +162,11 @@ const PerfilEmpresa = () => {
     const matricula = vehiculo.matricula;
     delete vehiculo.matricula;
 
-    await axios.put(`/vehiculos/${matricula}`, vehiculo);
+    await axios.put(`/vehiculos/${matricula}`, vehiculo,{
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     setModifyingVehicle(null);
 
@@ -147,7 +177,11 @@ const PerfilEmpresa = () => {
     await axios.put(
       `/empresas/${idEmpresa}/guias/${modifyingViaje.guia.id}/viaje`,
       viaje
-    );
+      ,{
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+    });
 
     setModifyingViaje(null);
 
@@ -155,7 +189,11 @@ const PerfilEmpresa = () => {
   };
 
   const deleteVehicle = async (matricula) => {
-    await axios.delete(`/vehiculos/${matricula}`);
+    await axios.delete(`/vehiculos/${matricula}`,{
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     getEmpresa();
   };
@@ -167,7 +205,11 @@ const PerfilEmpresa = () => {
     };
 
     try {
-      await axios.post("/empresas/asignar", requestBody);
+      await axios.post("/empresas/asignar", requestBody,{
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       setAssigningResponsable(false);
       getEmpresa();
@@ -177,7 +219,11 @@ const PerfilEmpresa = () => {
   };
 
   const updateStatusVehiculo = async (matricula, status) => {
-    await axios.put(`/vehiculos/${matricula}/status`, { status });
+    await axios.put(`/vehiculos/${matricula}/status`, { status },{
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     getEmpresa();
   };
