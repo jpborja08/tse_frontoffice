@@ -17,6 +17,7 @@ import GuiaForm from "@components/common/guiaForm";
 
 import ViajeForm from "@components/common/viajeForm";
 import ChoferForm from "@components/common/choferForm";
+import AssignVehicleForm from "@components/common/assignVehicleForm";
 
 import dayjs from "dayjs";
 
@@ -67,6 +68,8 @@ const PerfilEmpresa = () => {
   const [creatingGuia, setCreatingGuia] = useState(false);
   const [creatingViajeForGuia, setCreatingViajeForGuia] = useState(null);
   const [modifyingViaje, setModifyingViaje] = useState(null);
+  const [assigningVehiclesForChofer, setAssigningVehiclesForChofer] =
+    useState(null);
   const [userType, setUserType] = useState(null);
   const [assigningResponsable, setAssigningResponsable] = useState(false);
   const [cedula, setCedula] = useState("");
@@ -81,7 +84,7 @@ const PerfilEmpresa = () => {
   const router = useRouter();
 
   const getEmpresa = async () => {
-    const res = await axios.get(`/empresas/${idEmpresa}`,{
+    const res = await axios.get(`/empresas/${idEmpresa}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -101,8 +104,10 @@ const PerfilEmpresa = () => {
     const userType = sessionStorage.getItem("userType");
     setUserType(userType);
     if (userType === "RESPONSABLE") {
-      setIdEmpresa(JSON.parse(sessionStorage.getItem("empresa_responsable")).id);
-    };
+      setIdEmpresa(
+        JSON.parse(sessionStorage.getItem("empresa_responsable")).id
+      );
+    }
 
     if (!token) {
       router.push("/login");
@@ -114,12 +119,31 @@ const PerfilEmpresa = () => {
   }, [idEmpresa]);
 
   const createChofer = async (chofer) => {
-    await axios.post(`/empresas/${idEmpresa}/choferes`, chofer,{
+    await axios.post(`/empresas/${idEmpresa}/choferes`, chofer, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
     setCreatingChofer(false);
+    getEmpresa();
+  };
+
+  const assignVehiculesToChofer = async ({ cedula, vehiculosMatricula }) => {
+    await Promise.all(
+      vehiculosMatricula.map((matricula) =>
+        axios.post(
+          `/empresas/${idEmpresa}/choferes/${cedula}/vehiculos`,
+          { matricula },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+      )
+    );
+
+    setAssigningVehiclesForChofer(null);
     getEmpresa();
   };
 
@@ -132,7 +156,7 @@ const PerfilEmpresa = () => {
   };
 
   const createGuia = async (guia) => {
-    await axios.post(`/empresas/${idEmpresa}/guias`, guia,{
+    await axios.post(`/empresas/${idEmpresa}/guias`, guia, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -146,12 +170,13 @@ const PerfilEmpresa = () => {
   const createViaje = async (guia) => {
     await axios.post(
       `/empresas/${idEmpresa}/guias/${creatingViajeForGuia.id}/viaje`,
-      guia
-      ,{
+      guia,
+      {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-    });
+      }
+    );
 
     setCreatingViajeForGuia(null);
 
@@ -162,7 +187,7 @@ const PerfilEmpresa = () => {
     const matricula = vehiculo.matricula;
     delete vehiculo.matricula;
 
-    await axios.put(`/vehiculos/${matricula}`, vehiculo,{
+    await axios.put(`/vehiculos/${matricula}`, vehiculo, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -176,12 +201,13 @@ const PerfilEmpresa = () => {
   const updateViaje = async (viaje) => {
     await axios.put(
       `/empresas/${idEmpresa}/guias/${modifyingViaje.guia.id}/viaje`,
-      viaje
-      ,{
+      viaje,
+      {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-    });
+      }
+    );
 
     setModifyingViaje(null);
 
@@ -189,7 +215,7 @@ const PerfilEmpresa = () => {
   };
 
   const deleteVehicle = async (matricula) => {
-    await axios.delete(`/vehiculos/${matricula}`,{
+    await axios.delete(`/vehiculos/${matricula}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -205,7 +231,7 @@ const PerfilEmpresa = () => {
     };
 
     try {
-      await axios.post("/empresas/asignar", requestBody,{
+      await axios.post("/empresas/asignar", requestBody, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -219,14 +245,36 @@ const PerfilEmpresa = () => {
   };
 
   const updateStatusVehiculo = async (matricula, status) => {
-    await axios.put(`/vehiculos/${matricula}/status`, { status },{
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    await axios.put(
+      `/vehiculos/${matricula}/status`,
+      { status },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
     getEmpresa();
   };
+
+  const choferesConVehiculos =
+    data?.vehiculos.reduce((acc, current) => {
+      current.choferes.forEach((chofer) => {
+        let cedulaChofer;
+        if (chofer.cedula) {
+          cedulaChofer = chofer.cedula;
+        } else {
+          cedulaChofer = chofer;
+        }
+        if (acc[cedulaChofer]) {
+          acc[cedulaChofer].push(current.matricula);
+        } else {
+          acc[cedulaChofer] = [current.matricula];
+        }
+      });
+      return acc;
+    }, {}) ?? {};
 
   const soyResponsable = useMemo(
     () =>
@@ -544,12 +592,12 @@ const PerfilEmpresa = () => {
 
                     <TabPanel>
                       <div>
-                      <button
-                        onClick={() => setCreatingChofer(true)}
-                        className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mb-4"
-                      >
-                        Agregar Chofer
-                      </button>
+                        <button
+                          onClick={() => setCreatingChofer(true)}
+                          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded mb-4"
+                        >
+                          Agregar Chofer
+                        </button>
                         {data.choferes.length === 0 && (
                           <p className="text-gray-600">
                             No hay choferes registrados
@@ -559,12 +607,20 @@ const PerfilEmpresa = () => {
                         {data.choferes.map((chofer, index) => (
                           <div
                             key={index}
-                            className="bg-gray-200 rounded-lg p-4 mb-4"
+                            className="bg-gray-200 rounded-lg p-4 mb-4 flex justify-between "
                           >
                             <p className="text-gray-600">
                               <span className="font-semibold">Cédula:</span>{" "}
                               {chofer.cedula}
                             </p>
+                            <button
+                              className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded ml-4"
+                              onClick={() =>
+                                setAssigningVehiclesForChofer(chofer.cedula)
+                              }
+                            >
+                              Asignar Vehículos
+                            </button>
                           </div>
                         ))}
                       </div>
@@ -649,6 +705,21 @@ const PerfilEmpresa = () => {
 
       {data !== null && (
         <>
+          <Modal
+            isOpen={!!assigningVehiclesForChofer}
+            onRequestClose={() => setAssigningVehiclesForChofer(null)}
+            contentLabel="Asignar vehículos"
+            style={customStyles}
+          >
+            <AssignVehicleForm
+              cedula={assigningVehiclesForChofer}
+              alreadyAssignedVehicles={
+                choferesConVehiculos[assigningVehiclesForChofer]
+              }
+              onSubmit={assignVehiculesToChofer}
+              vehiculos={data?.vehiculos}
+            />
+          </Modal>
           <Modal
             isOpen={creatingViajeForGuia !== null}
             onRequestClose={() => setCreatingViajeForGuia(null)}
