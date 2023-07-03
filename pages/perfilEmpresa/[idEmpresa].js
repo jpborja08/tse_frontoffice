@@ -63,6 +63,7 @@ const vehiculoStatusMsg = {
 const PerfilEmpresa = () => {
   const [activeTab, setActiveTab] = useState("vehiculos");
   const [data, setData] = useState(null);
+  const [permiso, setPermiso] = useState(null);
   const [creatingVehicle, setCreatingVehicle] = useState(false);
   const [modifyingVehicle, setModifyingVehicle] = useState(null);
   const [creatingGuia, setCreatingGuia] = useState(false);
