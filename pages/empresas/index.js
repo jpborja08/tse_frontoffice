@@ -14,6 +14,16 @@ const EmpresaCard = ({ empresa }) => {
       <p className="text-gray-600">
         <span className="font-semibold">Nro. Empresa:</span> {empresa.numero}
       </p>
+      {empresa.permitida && (
+        <p className="text-gray-600">
+          <span className="font-semibold">Cumple permisos</span>
+        </p>
+      )}
+      {!empresa.permitida && (
+        <p className="text-gray-600">
+          <span className="font-semibold">No cumple permisos</span>
+        </p>
+      )}
       <Link
         href={`/perfilEmpresa/${empresa.id}`}
         passHref
@@ -27,6 +37,7 @@ const EmpresaCard = ({ empresa }) => {
 
 const EmpresasPage = () => {
   const [empresas, setEmpresas] = useState([]);
+  const [permisos, setPermisos] = useState([]);
   const [error, setError] = useState(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
 
