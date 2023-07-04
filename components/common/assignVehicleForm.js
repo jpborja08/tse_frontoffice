@@ -63,6 +63,15 @@ const AssignVehicleForm = ({
         <Select
           isMulti
           name="Vehículos"
+          maxMenuHeight={200}
+          menuPortalTarget={document.body}
+          styles={{
+            menuPortal: (base) => ({
+              ...base,
+              zIndex: 9999,
+              color: "#4b5563",
+            }),
+          }}
           value={formData.vehiculosMatricula}
           onChange={handleChangeSelect}
           options={mappedVehicles}

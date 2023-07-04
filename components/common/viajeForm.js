@@ -103,6 +103,15 @@ function GuiaForm({ idEmpresa, idGuia, onSubmit, choferes, viaje }) {
             </label>
             <Select
               id="vehiculo"
+              maxMenuHeight={150}
+              menuPortalTarget={document.body}
+              styles={{
+                menuPortal: (base) => ({
+                  ...base,
+                  zIndex: 9999,
+                  color: "#4b5563",
+                }),
+              }}
               options={vehiculosChofer.map((v) => ({
                 value: v.matricula,
                 label: v.matricula,
@@ -112,7 +121,6 @@ function GuiaForm({ idEmpresa, idGuia, onSubmit, choferes, viaje }) {
                 label: vehiculo,
               }}
               onChange={({ value }) => setVehiculo(value)}
-              maxMenuHeight={80}
             />
           </div>
         )}
