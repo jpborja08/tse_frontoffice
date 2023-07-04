@@ -26,7 +26,7 @@ function GuiaForm({ idEmpresa, onSubmit, initialData }) {
   useEffect(() => {
     const token = sessionStorage.getItem("token");
     const getInfo = async () => {
-      const { data } = await axios.get(`/empresas/${idEmpresa}/guias/data`,{
+      const { data } = await axios.get(`/empresas/${idEmpresa}/guias/data`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -69,13 +69,22 @@ function GuiaForm({ idEmpresa, onSubmit, initialData }) {
       <h2 className="font-bold text-xl mb-4 border-b pb-4">
         {initialData ? "Modificar guía" : "Registrar guía"}
       </h2>
-      <div className="columns-2">
+      <div className="columns-2 pb-4">
         <div className="mb-4">
           <label className="block text-sm font-bold mb-2" htmlFor="rubro">
             Rubro
           </label>
           <Select
             id="rubro"
+            maxMenuHeight={200}
+            menuPortalTarget={document.body}
+            styles={{
+              menuPortal: (base) => ({
+                ...base,
+                zIndex: 9999,
+                color: "#4b5563",
+              }),
+            }}
             options={rubros.map((r) => ({ value: r.id, label: r.nombre }))}
             onChange={(option) =>
               setFormData((prevFormData) => ({
@@ -91,6 +100,15 @@ function GuiaForm({ idEmpresa, onSubmit, initialData }) {
           </label>
           <Select
             id="tipoCarga"
+            maxMenuHeight={200}
+            menuPortalTarget={document.body}
+            styles={{
+              menuPortal: (base) => ({
+                ...base,
+                zIndex: 9999,
+                color: "#4b5563",
+              }),
+            }}
             options={tiposCarga.map((r) => ({ value: r.id, label: r.nombre }))}
             onChange={(option) =>
               setFormData((prevFormData) => ({
@@ -169,7 +187,7 @@ function GuiaForm({ idEmpresa, onSubmit, initialData }) {
           </p>
         )}
       </div>
-      <div className="flex justify-end mt-4">
+      <div className="flex justify-end">
         <button
           className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded focus:outline-none focus:shadow-outline"
           type="submit"
